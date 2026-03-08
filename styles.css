@@ -459,6 +459,11 @@ a:hover {
     height: 100%;
 }
 
+.product-card--out-of-stock {
+    filter: grayscale(100%);
+    opacity: 0.7;
+}
+
 /* Stagger animation for product cards */
 .product-card:nth-child(1) { animation-delay: 0.1s; }
 .product-card:nth-child(2) { animation-delay: 0.15s; }
@@ -602,6 +607,12 @@ a:hover {
 
 .btn--full {
     width: 100%;
+}
+
+.btn--disabled {
+    opacity: 0.5;
+    cursor: not-allowed !important;
+    pointer-events: none;
 }
 
 /* ========================================
@@ -817,8 +828,8 @@ a:hover {
 
 .social-login {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-    gap: var(--spacing-md);
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    gap: var(--spacing-sm);
     margin-bottom: var(--spacing-lg);
 }
 
@@ -827,83 +838,123 @@ a:hover {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-md);
+    gap: 4px;
+    padding: var(--spacing-sm) 8px;
     border-radius: var(--radius-md);
-    border: 1.5px solid rgba(255, 215, 0, 0.2);
-    background-color: transparent;
+    border: 1px solid rgba(255, 215, 0, 0.12);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
     color: var(--color-text-primary);
-    font-size: var(--font-size-xs);
+    font-size: 11px;
     font-weight: 600;
     transition: all var(--transition-normal);
     text-transform: capitalize;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.social-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: left var(--transition-normal);
+    z-index: -1;
+}
+
+.social-btn:hover::before {
+    left: 100%;
 }
 
 .social-icon {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     display: flex;
     color: currentColor;
+    transition: transform var(--transition-normal);
 }
 
+.social-btn__text {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+}
+
+.social-btn:hover .social-icon {
+    transform: scale(1.15);
+}
+
+/* Google Styling */
 .social-btn--google {
     border-color: var(--color-google);
     color: var(--color-google);
 }
 
 .social-btn--google:hover {
-    background-color: var(--color-google);
-    color: var(--color-white);
-    transform: scale(1.08);
-    box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+    background: linear-gradient(135deg, rgba(66, 133, 244, 0.15), rgba(66, 133, 244, 0.05));
+    border-color: var(--color-google);
+    box-shadow: 0 0 20px rgba(66, 133, 244, 0.4), 0 4px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
 }
 
+/* Facebook Styling */
 .social-btn--facebook {
     border-color: var(--color-facebook);
     color: var(--color-facebook);
 }
 
 .social-btn--facebook:hover {
-    background-color: var(--color-facebook);
-    color: var(--color-white);
-    transform: scale(1.08);
-    box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
+    background: linear-gradient(135deg, rgba(24, 119, 242, 0.15), rgba(24, 119, 242, 0.05));
+    border-color: var(--color-facebook);
+    box-shadow: 0 0 20px rgba(24, 119, 242, 0.4), 0 4px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
 }
 
+/* Twitter/X Styling */
 .social-btn--twitter {
     border-color: var(--color-twitter);
     color: var(--color-twitter);
 }
 
 .social-btn--twitter:hover {
-    background-color: var(--color-twitter);
-    color: var(--color-white);
-    transform: scale(1.08);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.05));
+    border-color: #555;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3), 0 4px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
 }
 
+/* Instagram Styling */
 .social-btn--instagram {
-    border-color: var(--color-instagram);
-    color: var(--color-instagram);
+    border: 1.5px solid transparent;
+    background: linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05)) padding-box,
+                linear-gradient(90deg, #fd5949, #d6249f, #285AEB) border-box;
+    color: #fd5949;
 }
 
 .social-btn--instagram:hover {
-    background-color: var(--color-instagram);
-    color: var(--color-white);
-    transform: scale(1.08);
-    box-shadow: 0 4px 12px rgba(225, 48, 108, 0.3);
+    background: linear-gradient(rgba(253, 89, 73, 0.1), rgba(214, 36, 159, 0.1)) padding-box,
+                linear-gradient(90deg, #fd5949, #d6249f, #285AEB) border-box;
+    box-shadow: 0 0 25px rgba(253, 89, 73, 0.4), 0 4px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
 }
 
+/* TikTok Styling */
 .social-btn--tiktok {
     border-color: var(--color-tiktok);
     color: var(--color-tiktok);
 }
 
 .social-btn--tiktok:hover {
-    background-color: var(--color-tiktok);
-    color: var(--color-white);
-    transform: scale(1.08);
-    box-shadow: 0 4px 12px rgba(37, 244, 238, 0.3);
+    background: linear-gradient(135deg, rgba(37, 244, 238, 0.15), rgba(37, 244, 238, 0.05));
+    border-color: var(--color-tiktok);
+    box-shadow: 0 0 20px rgba(37, 244, 238, 0.6), 
+                inset 0 0 10px rgba(37, 244, 238, 0.1), 
+                0 4px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
 }
 
 /* ========================================

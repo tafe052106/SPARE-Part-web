@@ -1,18 +1,19 @@
 /* ========================================
    SPARE PART STRIKE SHOP V2 - JAVASCRIPT
-   Advanced State Management & Theme Switching
+   Advanced State Management & Persistent Data Storage
    ======================================== */
 
 /* ========================================
-   PRODUCT DATA - MOTORCYCLE SPARE PARTS
+   INITIAL DATABASE - MOCK DATA STRUCTURE
    ======================================== */
 
-const spareParts = [
+const INITIAL_DATABASE = [
     {
         id: 1,
         name: 'Akrapović Titanium Exhaust System',
         category: 'engine',
         price: 799.99,
+        stockCount: 12,
         image: 'IMG-20260307-WA0013.jpg',
         badge: 'Premium'
     },
@@ -21,6 +22,7 @@ const spareParts = [
         name: 'Michelin Pilot Sport 4 120/70-17',
         category: 'tires',
         price: 229.99,
+        stockCount: 25,
         image: 'IMG-20260307-WA0014.jpg',
         badge: 'New'
     },
@@ -29,6 +31,7 @@ const spareParts = [
         name: 'LED Integrated Headlight Assembly HID',
         category: 'lighting',
         price: 449.99,
+        stockCount: 8,
         image: 'IMG-20260307-WA0016.jpg',
         badge: 'Hot'
     },
@@ -37,6 +40,7 @@ const spareParts = [
         name: 'Carbon Fiber Full Body Fairing Kit',
         category: 'body',
         price: 1599.99,
+        stockCount: 5,
         image: 'Screenshot_20260225-123528~2.png',
         badge: 'Elite'
     },
@@ -45,6 +49,7 @@ const spareParts = [
         name: 'K&N High-Flow Air Intake Filter',
         category: 'engine',
         price: 129.99,
+        stockCount: 35,
         image: 'IMG-20260307-WA0013.jpg',
         badge: 'Sale'
     },
@@ -53,10 +58,132 @@ const spareParts = [
         name: 'RGB LED Wheel Rim Light Kit (Set of 4)',
         category: 'lighting',
         price: 179.99,
+        stockCount: 18,
         image: 'IMG-20260307-WA0014.jpg',
         badge: 'Trending'
+    },
+    {
+        id: 7,
+        name: 'Brembo Brake Pads Performance Set',
+        category: 'engine',
+        price: 349.99,
+        stockCount: 22,
+        image: 'IMG-20260307-WA0016.jpg',
+        badge: 'Popular'
+    },
+    {
+        id: 8,
+        name: 'NGK Iridium Spark Plugs (Pack of 4)',
+        category: 'engine',
+        price: 89.99,
+        stockCount: 0,
+        image: 'IMG-20260307-WA0013.jpg',
+        badge: 'Out'
+    },
+    {
+        id: 9,
+        name: 'Pirelli Angel Street Tires 180/55',
+        category: 'tires',
+        price: 259.99,
+        stockCount: 14,
+        image: 'IMG-20260307-WA0014.jpg',
+        badge: 'New'
     }
 ];
+
+/* ========================================
+   DATABASE MANAGEMENT - CRUD OPERATIONS
+   ======================================== */
+
+/**
+ * Initialize localStorage database on first page load.
+ * If strike_shop_db doesn't exist, creates it with INITIAL_DATABASE.
+ */
+function initializeDatabase() {
+    if (!localStorage.getItem('strike_shop_db')) {
+        localStorage.setItem('strike_shop_db', JSON.stringify(INITIAL_DATABASE));
+        console.log('✓ Database initialized with default data');
+    }
+}
+
+/**
+ * Retrieve all products from localStorage.
+ * Gracefully handles errors and returns fallback data.
+ * @returns {Array} Array of product objects
+ */
+function getProducts() {
+    try {
+        const dbData = localStorage.getItem('strike_shop_db');
+        if (!dbData) {
+            console.warn('No database found. Reinitializing...');
+            initializeDatabase();
+            return INITIAL_DATABASE;
+        }
+        return JSON.parse(dbData);
+    } catch (error) {
+        console.error('Error retrieving products:', error);
+        return INITIAL_DATABASE;
+    }
+}
+
+/**
+ * Save products array to localStorage.
+ * @param {Array} products - Array of product objects to save
+ */
+function saveProducts(products) {
+    try {
+        localStorage.setItem('strike_shop_db', JSON.stringify(products));
+        console.log('✓ Products saved to database');
+    } catch (error) {
+        console.error('Error saving products:', error);
+    }
+}
+
+/**
+ * Update stock count for a specific product.
+ * Reduces stockCount and persists to localStorage.
+ * @param {number} productId - ID of the product to update
+ * @param {number} amount - Amount to reduce from stock (typically 1)
+ * @returns {Object} Result object with success status and updated product
+ */
+function updateStock(productId, amount = 1) {
+    try {
+        const products = getProducts();
+        const product = products.find(p => p.id === productId);
+        
+        if (!product) {
+            console.error(`Product with ID ${productId} not found`);
+            return { success: false, message: 'Product not found' };
+        }
+        
+        if (product.stockCount < amount) {
+            return { success: false, message: 'Insufficient stock' };
+        }
+        
+        product.stockCount -= amount;
+        saveProducts(products);
+        
+        return { 
+            success: true, 
+            message: 'Stock updated', 
+            product: product,
+            outOfStock: product.stockCount === 0
+        };
+    } catch (error) {
+        console.error('Error updating stock:', error);
+        return { success: false, message: 'Error updating stock' };
+    }
+}
+
+/**
+ * Get a single product by ID.
+ * @param {number} productId - ID of the product
+ * @returns {Object|null} Product object or null if not found
+ */
+function getProductById(productId) {
+    const products = getProducts();
+    return products.find(p => p.id === productId) || null;
+}
 
 /* ========================================
    STATE MANAGEMENT
@@ -135,6 +262,12 @@ class AppState {
             return { success: false, message: 'Please log in to manage your cart.' };
         }
         
+        // Check and update stock from database
+        const stockResult = updateStock(product.id, 1);
+        if (!stockResult.success) {
+            return { success: false, message: 'Item out of stock.' };
+        }
+        
         const existingItem = this.cart.find(item => item.id === product.id);
         if (existingItem) {
             existingItem.quantity += 1;
@@ -195,10 +328,11 @@ class AppState {
     }
 
     getFilteredProducts() {
+        const products = getProducts();
         if (this.currentCategory === 'all') {
-            return spareParts;
+            return products;
         }
-        return spareParts.filter(part => part.category === this.currentCategory);
+        return products.filter(part => part.category === this.currentCategory);
     }
 }
 
@@ -285,6 +419,21 @@ class DOMManager {
             clone.querySelector('.product-card__category').textContent = product.category.replace('-', ' ');
             clone.querySelector('.product-card__price').textContent = `$${product.price.toFixed(2)}`;
             clone.querySelector('.product-card__badge').textContent = product.badge;
+
+            // Handle stock display and button state
+            const addToCartBtn = clone.querySelector('[data-action="add-to-cart"]');
+            const isOutOfStock = product.stockCount === 0;
+            
+            if (isOutOfStock) {
+                // Disable button and apply out-of-stock styling
+                addToCartBtn.disabled = true;
+                addToCartBtn.textContent = '❌ Out of Stock';
+                addToCartBtn.classList.add('btn--disabled');
+                card.classList.add('product-card--out-of-stock');
+            } else {
+                // Show stock count in button
+                addToCartBtn.textContent = `🛒 Add to Cart (${product.stockCount})`;
+            }
 
             card.dataset.productId = product.id;
             card.dataset.product = JSON.stringify(product);
@@ -500,6 +649,9 @@ class EventHandlers {
    ======================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize database from localStorage
+    initializeDatabase();
+    
     const domManager = new DOMManager(appState);
     const eventHandlers = new EventHandlers(appState, domManager);
 
@@ -511,4 +663,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('✓ Spare Part Strike Shop V2 initialized successfully');
     console.log('✓ Theme system active');
     console.log('✓ Login state management ready');
+    console.log('✓ Database persistence active');
+    console.log('✓ Total products:', getProducts().length);
 });
