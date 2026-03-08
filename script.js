@@ -370,6 +370,7 @@ class DOMManager {
         this.signinForm = document.getElementById('signin-form');
         this.signupForm = document.getElementById('signup-form');
         this.authMessage = document.getElementById('auth-message');
+        this.headerNav = document.getElementById('header-nav');
     }
 
     applyTheme() {
@@ -474,8 +475,29 @@ class DOMManager {
             }
         });
 
+        // Update header based on login state
+        this.updateHeaderAuthUI();
+
         // Hamburger state
         this.navToggle.setAttribute('aria-expanded', this.appState.sidebarOpen);
+    }
+
+    updateHeaderAuthUI() {
+        if (this.appState.isLoggedIn && this.appState.currentUser) {
+            // Show user profile
+            this.loginBtn.innerHTML = `
+                <span class="user-avatar">${this.appState.currentUser.avatar || '👤'}</span>
+                <span class="user-name">${this.appState.currentUser.name}</span>
+                <span class="dropdown-indicator">▼</span>
+            `;
+            this.loginBtn.classList.add('is-profile');
+            this.loginBtn.setAttribute('aria-label', `Profile: ${this.appState.currentUser.name}`);
+        } else {
+            // Show login button
+            this.loginBtn.innerHTML = '🔐 Login';
+            this.loginBtn.classList.remove('is-profile');
+            this.loginBtn.setAttribute('aria-label', 'Open login modal');
+        }
     }
 
     updateAuthForm() {
@@ -541,7 +563,17 @@ class EventHandlers {
 
         // Login modal
         this.domManager.loginBtn.addEventListener('click', () => {
-            this.appState.openLoginModal();
+            if (this.appState.isLoggedIn) {
+                // Show logout confirmation
+                const confirmed = confirm(`Logout from ${this.appState.currentUser?.provider || 'your account'}?`);
+                if (confirmed) {
+                    this.appState.logout();
+                    this.domManager.renderProductGrid();
+                    this.domManager.showNotification('Logged out successfully 👋');
+                }
+            } else {
+                this.appState.openLoginModal();
+            }
         });
 
         this.domManager.loginModal.querySelector('.modal__overlay').addEventListener('click', () => {
@@ -638,9 +670,93 @@ class EventHandlers {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 const provider = btn.dataset.provider;
-                this.domManager.showNotification(`${provider} login would be handled here`);
+                this.handleSocialLogin(provider);
             });
         });
+    }
+
+    handleSocialLogin(provider) {
+        // Show fake popup with loading state
+        this.showSocialLoginPopup(provider);
+        
+        // Simulate connection delay (1.5 seconds)
+        setTimeout(() => {
+            const userData = this.generateSocialUserData(provider);
+            this.appState.login(userData);
+            this.closeSocialLoginPopup();
+            this.appState.closeLoginModal();
+            this.domManager.showNotification(`Welcome, ${userData.name}! 🎉`);
+            this.domManager.renderProductGrid();
+        }, 1500);
+    }
+
+    generateSocialUserData(provider) {
+        const platformData = {
+            google: {
+                name: 'Google User',
+                email: `user${Math.random().toString(36).substr(2, 9)}@gmail.com`,
+                avatar: '🔵',
+                provider: 'Google',
+                id: 'google_' + Math.random().toString(36).substr(2, 9)
+            },
+            facebook: {
+                name: 'Facebook User',
+                email: `user${Math.random().toString(36).substr(2, 9)}@facebook.com`,
+                avatar: '🔵',
+                provider: 'Facebook',
+                id: 'facebook_' + Math.random().toString(36).substr(2, 9)
+            },
+            twitter: {
+                name: 'Twitter User',
+                email: `user${Math.random().toString(36).substr(2, 9)}@twitter.com`,
+                avatar: '⚫',
+                provider: 'Twitter (X)',
+                id: 'twitter_' + Math.random().toString(36).substr(2, 9)
+            },
+            instagram: {
+                name: 'Instagram User',
+                email: `user${Math.random().toString(36).substr(2, 9)}@instagram.com`,
+                avatar: '📷',
+                provider: 'Instagram',
+                id: 'instagram_' + Math.random().toString(36).substr(2, 9)
+            },
+            tiktok: {
+                name: 'TikTok User',
+                email: `user${Math.random().toString(36).substr(2, 9)}@tiktok.com`,
+                avatar: '🎵',
+                provider: 'TikTok',
+                id: 'tiktok_' + Math.random().toString(36).substr(2, 9)
+            }
+        };
+
+        return platformData[provider] || platformData.google;
+    }
+
+    showSocialLoginPopup(provider) {
+        let popup = document.getElementById('social-login-popup');
+        if (!popup) {
+            popup = document.createElement('div');
+            popup.id = 'social-login-popup';
+            popup.className = 'social-login-popup';
+            document.body.appendChild(popup);
+        }
+        
+        popup.innerHTML = `
+            <div class="social-popup-content">
+                <div class="social-popup-icon">🔄</div>
+                <h3>Connecting to ${provider}...</h3>
+                <p>Authenticating your account</p>
+                <div class="loading-spinner"></div>
+            </div>
+        `;
+        popup.classList.add('is-visible');
+    }
+
+    closeSocialLoginPopup() {
+        const popup = document.getElementById('social-login-popup');
+        if (popup) {
+            popup.classList.remove('is-visible');
+        }
     }
 }
 
