@@ -838,8 +838,8 @@ a:hover {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    padding: var(--spacing-sm) 8px;
+    gap: 2px;
+    padding: 4px 6px;
     border-radius: var(--radius-md);
     border: 1px solid rgba(255, 215, 0, 0.12);
     background: rgba(255, 255, 255, 0.05);
@@ -872,16 +872,16 @@ a:hover {
 }
 
 .social-icon {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     display: flex;
     color: currentColor;
     transition: transform var(--transition-normal);
 }
 
 .social-btn__text {
-    font-size: 10px;
-    letter-spacing: 0.5px;
+    font-size: 9px;
+    letter-spacing: 0.4px;
 }
 
 .social-btn:hover .social-icon {
