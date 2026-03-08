@@ -13,7 +13,7 @@ const spareParts = [
         name: 'Akrapović Titanium Exhaust System',
         category: 'engine',
         price: 799.99,
-        image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop&q=80',
+        image: 'IMG-20260307-WA0013.jpg',
         badge: 'Premium'
     },
     {
@@ -21,7 +21,7 @@ const spareParts = [
         name: 'Michelin Pilot Sport 4 120/70-17',
         category: 'tires',
         price: 229.99,
-        image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=300&fit=crop&q=80',
+        image: 'IMG-20260307-WA0014.jpg',
         badge: 'New'
     },
     {
@@ -29,7 +29,7 @@ const spareParts = [
         name: 'LED Integrated Headlight Assembly HID',
         category: 'lighting',
         price: 449.99,
-        image: 'https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=400&h=300&fit=crop&q=80',
+        image: 'IMG-20260307-WA0016.jpg',
         badge: 'Hot'
     },
     {
@@ -37,7 +37,7 @@ const spareParts = [
         name: 'Carbon Fiber Full Body Fairing Kit',
         category: 'body',
         price: 1599.99,
-        image: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=400&h=300&fit=crop&q=80',
+        image: 'Screenshot_20260225-123528~2.png',
         badge: 'Elite'
     },
     {
@@ -45,7 +45,7 @@ const spareParts = [
         name: 'K&N High-Flow Air Intake Filter',
         category: 'engine',
         price: 129.99,
-        image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=300&fit=crop&q=80',
+        image: 'IMG-20260307-WA0013.jpg',
         badge: 'Sale'
     },
     {
@@ -53,7 +53,7 @@ const spareParts = [
         name: 'RGB LED Wheel Rim Light Kit (Set of 4)',
         category: 'lighting',
         price: 179.99,
-        image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=400&h=300&fit=crop&q=80',
+        image: 'IMG-20260307-WA0014.jpg',
         badge: 'Trending'
     }
 ];
